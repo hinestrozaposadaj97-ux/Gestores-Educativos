@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestores Educativos · Dinamizador</title>
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f7fa;
+    --surface: #ffffff;
+    --surface2: #f0f2f5;
+    --border: #e1e5eb;
+    --accent: #2563eb;
+    --accent-light: #eff6ff;
+    --accent2: #16a34a;
+    --accent2-light: #f0fdf4;
+    --warn: #d97706;
+    --warn-light: #fffbeb;
+    --danger: #dc2626;
+    --danger-light: #fef2f2;
+    --purple: #7c3aed;
+    --purple-light: #f5f3ff;
+    --brown: #92400e;
+    --brown-light: #fffbeb;
+    --text: #111827;
+    --text2: #6b7280;
+    --text3: #9ca3af;
+    --radius: 12px;
+    --shadow: 0 1px 3px rgba(0,0,0,0.08), 0 1px 2px rgba(0,0,0,0.04);
+    --shadow-md: 0 4px 6px rgba(0,0,0,0.07), 0 2px 4px rgba(0,0,0,0.05);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+
+  header {
+    background: linear-gradient(135deg, #1e40af, #2563eb);
+    position: sticky; top: 0; z-index: 50;
+    box-shadow: 0 2px 8px rgba(37,99,235,0.3);
+  }
+  .header-inner {
+    max-width: 860px; margin: 0 auto;
+    padding: 16px 20px;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+  header h1 { font-size: 1rem; font-weight: 700; color: #fff; }
+  header p { font-size: 0.73rem; color: rgba(255,255,255,0.7); margin-top: 1px; }
+  .header-badge { background: rgba(255,255,255,0.2); color: #fff; padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; }
+
+  .tabs-bar {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow);
+  }
+  .tabs-inner { max-width: 860px; margin: 0 auto; padding: 0 20px; display: flex; gap: 0; }
+  .tab-btn {
+    padding: 14px 20px;
+    border: none; border-bottom: 3px solid transparent;
+    background: transparent;
+    color: var(--text2);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.85rem; font-weight: 600;
+    cursor: pointer; transition: all 0.18s;
+  }
+  .tab-btn:hover { color: var(--accent); }
+  .tab-btn.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+  .container { max-width: 860px; margin: 0 auto; padding: 24px 16px; }
+  .view { display: none; }
+  .view.active { display: block; }
+
+  /* Cards */
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; margin-bottom: 16px; box-shadow: var(--shadow); }
+  .card-label { font-size: 0.72rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+
+  select, input[type="date"], input[type="time"], textarea {
+    width: 100%; background: var(--surface2); border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 10px 14px; color: var(--text); font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.9rem; outline: none; transition: border-color 0.2s, box-shadow 0.2s; appearance: auto;
+  }
+  select:focus, input:focus, textarea:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); background: #fff; }
+  textarea { resize: vertical; min-height: 72px; }
+
+  .search-wrap { position: relative; margin-bottom: 14px; }
+  .search-input {
+    width: 100%; background: var(--surface); border: 1.5px solid var(--border); border-radius: 8px;
+    padding: 10px 14px 10px 36px; color: var(--text);
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.88rem; outline: none; transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(37,99,235,0.1); }
+  .search-input::placeholder { color: var(--text3); }
+  .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text3); font-size: 14px; }
+
+  .students-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .students-header h2 { font-size: 0.9rem; font-weight: 700; }
+  .counter { font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; background: var(--accent-light); color: var(--accent); padding: 4px 10px; border-radius: 20px; font-weight: 500; }
+
+  .student-card { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--radius); margin-bottom: 8px; box-shadow: var(--shadow); overflow: hidden; transition: border-color 0.2s, box-shadow 0.2s; }
+  .student-card:hover { border-color: #93c5fd; box-shadow: var(--shadow-md); }
+  .student-card.expanded { border-color: var(--accent); }
+  .student-top { display: flex; align-items: center; gap: 12px; padding: 14px 16px; cursor: pointer; }
+  .status-pill { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .status-pill.sin-contacto { background: var(--text3); }
+  .status-pill.agendado { background: var(--warn); box-shadow: 0 0 0 3px var(--warn-light); }
+  .status-pill.caracterizado { background: var(--accent2); box-shadow: 0 0 0 3px var(--accent2-light); }
+  .status-pill.contactado-pero { background: var(--danger); box-shadow: 0 0 0 3px var(--danger-light); }
+  .status-pill.graduado { background: var(--purple); box-shadow: 0 0 0 3px var(--purple-light); }
+  .status-pill.carta-cierre { background: var(--brown); box-shadow: 0 0 0 3px var(--brown-light); }
+  .student-name { font-size: 0.88rem; font-weight: 600; flex: 1; }
+  .student-badge { font-size: 0.7rem; padding: 3px 9px; border-radius: 20px; font-weight: 600; }
+  .badge-sin { background: var(--surface2); color: var(--text3); }
+  .badge-agendado { background: var(--warn-light); color: var(--warn); }
+  .badge-caracterizado { background: var(--accent2-light); color: var(--accent2); }
+  .badge-contactado-pero { background: var(--danger-light); color: var(--danger); }
+  .badge-graduado { background: var(--purple-light); color: var(--purple); }
+  .badge-carta-cierre { background: var(--brown-light); color: var(--brown); }
+  .student-meta { font-size: 0.74rem; color: var(--text2); padding: 0 16px 12px 36px; margin-top: -4px; }
+  .chevron { color: var(--text3); transition: transform 0.2s; font-size: 11px; margin-left: auto; flex-shrink: 0; }
+  .student-card.expanded .chevron { transform: rotate(180deg); color: var(--accent); }
+
+  .edit-form { display: none; padding: 16px; background: var(--surface2); border-top: 1px solid var(--border); }
+  .edit-form.open { display: block; }
+  .form-label { font-size: 0.72rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 6px; display: block; }
+  .form-group { margin-bottom: 12px; }
+  .form-row { display: flex; gap: 10px; margin-bottom: 12px; }
+  .form-row > * { flex: 1; }
+
+  .status-buttons { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 12px; }
+  .status-btn { flex: 1 1 calc(50% - 4px); min-width: 120px; padding: 9px 6px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text2); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.76rem; font-weight: 600; cursor: pointer; transition: all 0.18s; text-align: center; }
+  .status-btn.active-sin { background: var(--surface2); border-color: var(--text3); color: var(--text); }
+  .status-btn.active-agendado { background: var(--warn-light); border-color: var(--warn); color: var(--warn); }
+  .status-btn.active-caracterizado { background: var(--accent2-light); border-color: var(--accent2); color: var(--accent2); }
+  .status-btn.active-contactado-pero { background: var(--danger-light); border-color: var(--danger); color: var(--danger); }
+  .status-btn.active-graduado { background: var(--purple-light); border-color: var(--purple); color: var(--purple); }
+  .status-btn.active-carta-cierre { background: var(--brown-light); border-color: var(--brown); color: var(--brown); }
+
+  /* Filtros de estado en dashboard */
+  .filter-bar { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 20px; }
+  .filter-chip {
+    padding: 7px 14px; border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--surface); color: var(--text2);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: 0.78rem; font-weight: 600;
+    cursor: pointer; transition: all 0.18s;
+  }
+  .filter-chip:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-chip.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  .filter-chip.fc-agendado.active { background: var(--warn); border-color: var(--warn); color: #fff; }
+  .filter-chip.fc-caracterizado.active { background: var(--accent2); border-color: var(--accent2); color: #fff; }
+  .filter-chip.fc-contactado.active { background: var(--danger); border-color: var(--danger); color: #fff; }
+  .filter-chip.fc-graduado.active { background: var(--purple); border-color: var(--purple); color: #fff; }
+  .filter-chip.fc-carta.active { background: var(--brown); border-color: var(--brown); color: #fff; }
+  .filter-chip.fc-sin.active { background: var(--text3); border-color: var(--text3); color: #fff; }
+  .filter-results { margin-top: 4px; }
+  .filter-gestor-tag {
+    font-size: 0.7rem; font-weight: 700;
+    background: var(--accent-light); color: var(--accent);
+    padding: 2px 8px; border-radius: 10px; margin-left: 8px;
+  }
+
+  .schedule-fields, .char-fields { display: none; }
+  .schedule-fields.show, .char-fields.show { display: block; }
+
+  .save-btn { width: 100%; padding: 11px; background: var(--accent); color: #fff; border: none; border-radius: 8px; font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.88rem; font-weight: 700; cursor: pointer; transition: background 0.2s; margin-top: 4px; }
+  .save-btn:hover { background: #1d4ed8; }
+  .save-btn:disabled { background: var(--text3); cursor: not-allowed; }
+
+  .sync-bar { display: flex; align-items: center; gap: 8px; padding: 10px 14px; background: var(--surface); border: 1px solid var(--border); border-radius: 8px; margin-bottom: 14px; font-size: 0.78rem; color: var(--text2); box-shadow: var(--shadow); }
+  .sync-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .sync-dot.syncing { background: var(--warn); animation: pulse 1s infinite; }
+  .sync-dot.synced { background: var(--accent2); }
+  .sync-dot.error { background: var(--danger); }
+  @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.3} }
+
+  /* Dashboard */
+  .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 14px; margin-bottom: 24px; }
+  .stat-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 20px; box-shadow: var(--shadow); }
+  .stat-card h3 { font-size: 0.72rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 8px; }
+  .stat-num { font-family: 'JetBrains Mono', monospace; font-size: 2rem; font-weight: 700; line-height: 1; }
+  .stat-num.blue { color: var(--accent); }
+  .stat-num.green { color: var(--accent2); }
+  .stat-num.yellow { color: var(--warn); }
+  .stat-num.gray { color: var(--text3); }
+  .stat-sub { font-size: 0.75rem; color: var(--text2); margin-top: 5px; }
+
+  .section-title { font-size: 0.78rem; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 14px; }
+
+  .gestor-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 18px; margin-bottom: 12px; box-shadow: var(--shadow); }
+  .gestor-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .gestor-card-header h3 { font-size: 0.92rem; font-weight: 700; }
+  .pct-badge { font-family: 'JetBrains Mono', monospace; font-size: 0.82rem; font-weight: 700; color: var(--accent); background: var(--accent-light); padding: 3px 10px; border-radius: 20px; }
+  .progress-bar { height: 7px; background: var(--surface2); border-radius: 4px; overflow: hidden; margin-bottom: 10px; }
+  .progress-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, var(--accent2), var(--accent)); transition: width 0.6s ease; }
+  .gestor-mini-stats { display: flex; gap: 16px; flex-wrap: wrap; }
+  .g-stat { display: flex; align-items: center; gap: 5px; font-size: 0.75rem; font-weight: 600; }
+  .g-dot { width: 8px; height: 8px; border-radius: 50%; }
+
+  .refresh-btn { display: flex; align-items: center; gap: 6px; padding: 8px 16px; border-radius: 8px; border: 1.5px solid var(--border); background: var(--surface); color: var(--text2); font-family: 'Plus Jakarta Sans', sans-serif; font-size: 0.8rem; font-weight: 600; cursor: pointer; transition: all 0.18s; }
+  .refresh-btn:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+
+  .dash-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; }
+
+  .loading-overlay { display: none; position: fixed; inset: 0; background: rgba(245,247,250,0.88); z-index: 200; align-items: center; justify-content: center; flex-direction: column; gap: 14px; }
+  .loading-overlay.show { display: flex; }
+  .spinner { width: 34px; height: 34px; border: 3px solid var(--border); border-top-color: var(--accent); border-radius: 50%; animation: spin 0.8s linear infinite; }
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .loading-text { font-size: 0.85rem; color: var(--text2); font-weight: 500; }
+
+  .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--text); border-radius: 10px; padding: 12px 20px; font-size: 0.85rem; color: #fff; opacity: 0; transition: all 0.3s; z-index: 300; white-space: nowrap; box-shadow: var(--shadow-md); }
+  .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+  .toast.error { background: var(--danger); }
+  .toast.success { background: var(--accent2); }
+
+  @media (max-width: 600px) {
+    .form-row { flex-direction: column; }
+    .status-buttons { flex-direction: column; }
+    .stats-grid { grid-template-columns: 1fr 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loading-overlay">
+  <div class="spinner"></div>
+  <div class="loading-text" id="loading-text">Cargando...</div>
+</div>
+
+<header>
+  <div class="header-inner">
+    <div class="header-left">
+      <div class="logo">📚</div>
+      <div>
+        <h1>Gestores Educativos</h1>
+        <p>Panel del dinamizador</p>
+      </div>
+    </div>
+    <span class="header-badge">🛡️ Dinamizador</span>
+  </div>
+</header>
+
+<div class="tabs-bar">
+  <div class="tabs-inner">
+    <button class="tab-btn active" onclick="showView('gestor', this)">✏️ Registrar</button>
+    <button class="tab-btn" onclick="showView('dashboard', this)">📊 Dashboard</button>
+    <button class="tab-btn" onclick="showView('filtro', this)">🔍 Filtrar</button>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- REGISTRAR -->
+  <div id="view-gestor" class="view active">
+    <div class="card">
+      <div class="card-label">Selecciona un gestor</div>
+      <select id="gestor-select" onchange="loadStudents()">
+        <option value="">— Elige un gestor —</option>
+      </select>
+    </div>
+    <div id="student-section" style="display:none">
+      <div class="sync-bar">
+        <div class="sync-dot synced" id="sync-dot"></div>
+        <span id="sync-text">Conectado · Google Sheets</span>
+      </div>
+      <div class="search-wrap">
+        <span class="search-icon">🔍</span>
+        <input class="search-input" type="text" id="search-input" placeholder="Buscar estudiante..." oninput="filterStudents()">
+      </div>
+      <div class="students-header">
+        <h2>Estudiantes asignados</h2>
+        <span class="counter" id="student-counter">0 / 0</span>
+      </div>
+      <div id="student-list"></div>
+    </div>
+  </div>
+
+  <!-- DASHBOARD -->
+  <div id="view-dashboard" class="view">
+    <div class="dash-header">
+      <div class="section-title">Resumen general</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <span id="auto-timer" style="font-size:0.75rem;color:var(--text3);font-family:'JetBrains Mono',monospace;"></span>
+        <button class="refresh-btn" onclick="manualRefresh()">🔄 Actualizar</button>
+      </div>
+    </div>
+    <div class="stats-grid" id="global-stats"></div>
+    <div class="section-title">Avance por gestor</div>
+    <div id="gestor-summaries"></div>
+  </div>
+
+  <!-- FILTRO -->
+  <div id="view-filtro" class="view">
+    <div class="section-title" style="margin-bottom:14px;">Filtrar por estado</div>
+    <div class="filter-bar">
+      <button class="filter-chip fc-todos active" onclick="applyFilter('todos', this)">📋 Todos</button>
+      <button class="filter-chip fc-sin" onclick="applyFilter('sin-contacto', this)">⚪ Sin contacto</button>
+      <button class="filter-chip fc-agendado" onclick="applyFilter('agendado', this)">🟡 Agendado</button>
+      <button class="filter-chip fc-caracterizado" onclick="applyFilter('caracterizado', this)">🟢 Caracterizado</button>
+      <button class="filter-chip fc-contactado" onclick="applyFilter('contactado-pero', this)">🔴 Contactado pero...</button>
+      <button class="filter-chip fc-graduado" onclick="applyFilter('graduado', this)">🎓 Graduado</button>
+      <button class="filter-chip fc-carta" onclick="applyFilter('carta-cierre', this)">📄 Carta de cierre</button>
+    </div>
+    <div id="filter-count" style="font-size:0.8rem;color:var(--text2);margin-bottom:12px;font-weight:600;"></div>
+    <div class="filter-results" id="filter-results"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const SHEET_URL = 'https://script.google.com/macros/s/AKfycbxu2wzZ_ahCfJOu0GLQ8J-4xIbPAExPRX8x-L-ZfQWyN5vsrBYgaRogCDzTPC96O1okNA/exec';
+
+const DATA = {
+  "Laura Ramirez": ["RESTREPO HERRERA SERGIO ANDRES", "OSPINA FONNEGRA PAMELA", "HERNANDEZ ZAPATA SARA", "HOYOS RUA CARLOS ANDRES", "NARANJO CASTAÑEDA JUAN CAMILO", "GALEANO FERNANDEZ BRAYAN", "CORREA CARDENAS MARIA JOSE", "MENESES GARCIA ESTEFANIA", "CORTES FLOREZ SANTIAGO ALEJANDRO", "MARTINEZ GOMEZ MICHEL DANILO", "BLANDON SANCHEZ YADYS YOHANA", "QUEBRADA SANICETO JOHAN CAMILO", "FORONDA LOPEZ CATHERINE", "MARIN PALACIO MARIANA", "TABORDA CASTRO JAVIER JOSNEY"],
+  "Victor  Calle": ["RUIZ GARCIA JERONIMO", "MORENO GARCIA JUAN DAVID", "MENA LOPEZ DERIZ SANTIAGO", "VALDERRAMA AGUILAR JULIAN DAVID", "SEPULVEDA PIEDRAHITA VALENTINA", "SEPULVEDA CAROLINA", "VALENCIA AGUIRRE LEIDY YULIETH", "MONTENEGRO BEDOYA JOHN FERNANDO", "RODRIGUEZ ZAMORA EMMANUEL", "VELASQUEZ ARANGO MILDREY YURANY", "GIL LOTERO JULIANA", "PALACIOS CORDOBA KARLA SOFIA", "CARO RUIZ MANUELA", "CARDONA CARVAJAL YOLANDA", "HOYOS MACKWEN MARIANA"],
+  "Yuli Paola Murillo": ["VILLA ARIAS VALENTINA", "ECHEVERRI MORALES PAULINA", "VALENCIA SOTO SANTIAGO", "ARBOLEDA ORTIZ MAGNOLIA", "VASQUEZ VASQUEZ YURI MARCELA", "PATIÑO SEPULVEDA DAVID", "BLANDON DAVID LAURA YOMARA", "GAVIRIA PEñA MISHELLE", "CESPEDES PACHECO ANDRY CAROLINA", "LONDOÑO VELEZ LILIANA ANDREA", "RODRIGUEZ HERRERA SAMANTHA", "SANCHEZ LONDOÑO JUAN MANUEL", "SANCHEZ HERNANDEZ ISABELLA", "CANO DUQUE YERLIN", "MONTOYA MARTINEZ DANIELA"],
+  "Andres Betancur": ["CEBALLOS GALLEGO ISABELLA", "GALLEGO AGUIRRE FREDY ARMANDO", "BECERRA LUJAN LADY TATIANA", "GALEANO ELIZABETH", "PAREJA VASQUEZ MARIANA", "OROZCO MUÑOZ DANIEL", "ZAPATA ZAPATA MARYI ZULIANY", "MONA MUNERA THOMAS", "GRANADOS ALZATE SARA SOFIA", "MANCO JARAMILLO DAYS DANIELA", "YEPES LEZCANO BRANDON", "LOAIZA GALEANO SHIRLEY XIMENA", "MADRID ARISTIZABAL MARIANA", "SEGURA CALLE CARLOS ANDRES", "VELASQUEZ ZAPATA KEVIN ANDRES"],
+  "Maria Alejandra Soto": ["MARTINEZ CIRO ERICA PAOLA", "HENAO RENDON LUISA FERNANDA", "ROJAS PULGARIN MARLENY", "RESTREPO OSORNO JUAN JOSE", "LOPEZ ZAPATA ANA SOFIA", "GONZALEZ QUICENO SOFIA", "MORALES RUIZ ANGIE NICOLE", "MEJIA ACOSTA VANEISY LUCIA", "GRANADOS YEPES JOSE HUMBERTO", "VARELA MAZO CRISTIAN ALEXANDER", "LONDOÑO SERNA ESTEVEN", "HERNANDEZ SIERRA YISEL ALEJANDRA", "ARIAS CIRO ANDRES", "CHICA RODRIGUEZ JINNEI"],
+  "Paula Forero": ["MONTOYA ECHEVERRI MARIA SOFIA", "MONSALVE VELASQUEZ SARA", "OROZCO LONDOÑO LUIS MATEO", "PINEDA MESA KATHERINE", "TAUTIVA VILLARRAGA JULIETH ALEJANDRA", "GIL USME NIDIAN", "URREA GARCIA MARIA FERNANDA", "RESTREPO ECHAVARRIA SAMUEL", "TORO ROJAS SARAY DAHIANA", "PATIÑO CANO SAMUEL", "MARTINEZ FIGUEROA MARIA FERNANDA", "BERMUDEZ CATAÑO JUAN PABLO", "LONDOÑO ZAPATA JUAN DAVID", "CALLE MARTINEZ ESTEFANIA", "CANO OSPINA SUSANA"],
+  "William Morales": ["SIERRA HERRERA MARIANA", "GIRALDO MARULANDA SEBASTIAN", "CABALLERO CASUA ABDEL ENRIQUE", "ECHAVARRIA CARVAJAL LEIDY MARION", "GUERRERO JARAMILLO ISABELA", "ALVAREZ LOAIZA VALERYN", "CEBALLOS HERRERA SAMUEL", "PEREZ MARIN MATEO", "TAFUR OSORNO JUAN CAMILO", "LUNA MEJIA SAMUEL", "MACIAS VARGAS YOFRAN ESTIVER", "OSPINA MORALES MANUELA", "ESPINOSA TAFUR BRAYAN ALEXANDER", "VASQUEZ AREIZA YOLANDA ESTELLA", "YARA RENDON SAHILY NATZUMY"]
+};
+
+let sheetCache = {};
+let currentGestor = '';
+const formStatus = {};
+
+const gestorSelect = document.getElementById('gestor-select');
+Object.keys(DATA).forEach(g => { const o = document.createElement('option'); o.value=g; o.textContent=g; gestorSelect.appendChild(o); });
+
+function showLoading(t) { document.getElementById('loading-text').textContent=t||'Cargando...'; document.getElementById('loading-overlay').classList.add('show'); }
+function hideLoading() { document.getElementById('loading-overlay').classList.remove('show'); }
+function setSyncState(s, t) { const d=document.getElementById('sync-dot'),l=document.getElementById('sync-text'); if(d)d.className='sync-dot '+s; if(l)l.textContent=t; }
+
+async function fetchSheetData() {
+  try {
+    setSyncState('syncing','Sincronizando...');
+    const res = await fetch(SHEET_URL+'?t='+Date.now());
+    const rows = await res.json();
+    sheetCache = {};
+    rows.forEach(r => { if(r.gestor&&r.estudiante) sheetCache[r.gestor+'||'+r.estudiante]=r; });
+    setSyncState('synced','Conectado · Google Sheets');
+    return true;
+  } catch(e) { setSyncState('error','Error de conexión'); return false; }
+}
+
+async function saveToSheet(payload) {
+  setSyncState('syncing','Guardando...');
+  try {
+    await fetch(SHEET_URL,{method:'POST',mode:'no-cors',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+    sheetCache[payload.gestor+'||'+payload.estudiante]={...payload};
+    setSyncState('synced','Guardado ✓');
+    return true;
+  } catch(e) { setSyncState('error','Error al guardar'); return false; }
+}
+
+function showView(v, btn) {
+  document.querySelectorAll('.view').forEach(el=>el.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(el=>el.classList.remove('active'));
+  document.getElementById('view-'+v).classList.add('active');
+  btn.classList.add('active');
+  if(v==='dashboard') renderDashboard();
+  if(v==='filtro') loadAndFilter();
+  handleAutoRefresh(v);
+}
+
+let currentFilter = 'todos';
+
+async function loadAndFilter() {
+  showLoading('Cargando datos...');
+  await fetchSheetData();
+  hideLoading();
+  renderFilter(currentFilter);
+}
+
+function applyFilter(estado, btn) {
+  currentFilter = estado;
+  document.querySelectorAll('.filter-chip').forEach(c=>c.classList.remove('active'));
+  btn.classList.add('active');
+  renderFilter(estado);
+}
+
+function renderFilter(estado) {
+  const container = document.getElementById('filter-results');
+  const countEl = document.getElementById('filter-count');
+  container.innerHTML = '';
+  let count = 0;
+  Object.entries(DATA).forEach(([gestor, students]) => {
+    students.forEach(student => {
+      const key = gestor+'||'+student;
+      const rec = sheetCache[key] || {estado:'sin-contacto'};
+      const est = rec.estado || 'sin-contacto';
+      if(estado === 'todos' || est === estado) {
+        container.appendChild(buildCard(student, rec, key, gestor));
+        count++;
+      }
+    });
+  });
+  const labels = {'todos':'estudiantes','sin-contacto':'sin contacto','agendado':'agendados','caracterizado':'caracterizados','contactado-pero':'contactados pero...','graduado':'graduados','carta-cierre':'con carta de cierre'};
+  countEl.textContent = count + ' ' + (labels[estado]||estado);
+}
+
+async function loadStudents() {
+  currentGestor = gestorSelect.value;
+  if(!currentGestor){document.getElementById('student-section').style.display='none';return;}
+  document.getElementById('student-section').style.display='block';
+  showLoading('Cargando estudiantes...');
+  await fetchSheetData();
+  hideLoading();
+  document.getElementById('search-input').value='';
+  renderStudents();
+}
+
+function filterStudents(){renderStudents(document.getElementById('search-input').value.toLowerCase());}
+
+function renderStudents(filter){
+  filter=filter||'';
+  const students=DATA[currentGestor]||[];
+  const list=document.getElementById('student-list');
+  list.innerHTML='';
+  const filtered=students.filter(s=>s.toLowerCase().includes(filter));
+  const char=students.filter(s=>(sheetCache[currentGestor+'||'+s]||{}).estado==='caracterizado').length;
+  document.getElementById('student-counter').textContent=char+' / '+students.length;
+  filtered.forEach(s=>{const key=currentGestor+'||'+s;list.appendChild(buildCard(s,sheetCache[key]||{estado:'sin-contacto'},key));});
+}
+
+function sid(key){
+  let hash=0;
+  for(let i=0;i<key.length;i++){hash=((hash<<5)-hash)+key.charCodeAt(i);hash|=0;}
+  return 'id'+Math.abs(hash).toString(36)+key.length;
+}
+
+function buildCard(student,rec,key,gestorTag){
+  const id=sid(key);
+  const card=document.createElement('div');
+  card.className='student-card';
+  const status=rec.estado||'sin-contacto';
+  const labels={'sin-contacto':'Sin contacto','agendado':'Agendado','caracterizado':'Caracterizado','contactado-pero':'Contactado pero...','graduado':'Graduado','carta-cierre':'Carta de cierre'};
+  const badges={'sin-contacto':'badge-sin','agendado':'badge-agendado','caracterizado':'badge-caracterizado','contactado-pero':'badge-contactado-pero','graduado':'badge-graduado','carta-cierre':'badge-carta-cierre'};
+  let meta='';
+  if(status==='agendado'&&rec.fechaAgenda) meta='📅 '+rec.fechaAgenda+' '+(rec.horaAgenda||'');
+  if(status==='caracterizado'&&rec.fechaCaracterizacion) meta='✅ '+rec.fechaCaracterizacion+' '+(rec.horaCaracterizacion||'');
+  if(rec.observacion){const o=String(rec.observacion);meta+=(meta?' · ':'')+o.substring(0,45)+(o.length>45?'...':'');}
+  card.innerHTML=`
+    <div class="student-top">
+      <div class="status-pill ${status}"></div>
+      <span class="student-name">${student}${gestorTag?`<span class="filter-gestor-tag">${gestorTag}</span>`:''}</span>
+      <span class="student-badge ${badges[status]}">${labels[status]}</span>
+      <span class="chevron">▼</span>
+    </div>
+    ${meta?`<div class="student-meta">${meta}</div>`:''}
+    <div class="edit-form" id="form-${id}">
+      <div class="form-group">
+        <label class="form-label">Estado de la visita</label>
+        <div class="status-buttons">
+          <button class="status-btn ${status==='sin-contacto'?'active-sin':''}">⚪ Sin contacto</button>
+          <button class="status-btn ${status==='agendado'?'active-agendado':''}">🟡 Agendado</button>
+          <button class="status-btn ${status==='caracterizado'?'active-caracterizado':''}">🟢 Caracterizado</button>
+          <button class="status-btn ${status==='contactado-pero'?'active-contactado-pero':''}">🔴 Contactado pero...</button>
+          <button class="status-btn ${status==='graduado'?'active-graduado':''}">🎓 Graduado</button>
+          <button class="status-btn ${status==='carta-cierre'?'active-carta-cierre':''}">📄 Carta de cierre</button>
+        </div>
+      </div>
+      <div class="schedule-fields ${status==='agendado'?'show':''}" id="sched-${id}">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Fecha visita</label><input type="date" id="af-${id}" value="${rec.fechaAgenda||''}"></div>
+          <div class="form-group"><label class="form-label">Hora visita</label><input type="time" id="ah-${id}" value="${rec.horaAgenda||''}"></div>
+        </div>
+      </div>
+      <div class="char-fields ${status==='caracterizado'?'show':''}" id="char-${id}">
+        <div class="form-row">
+          <div class="form-group"><label class="form-label">Fecha caracterización</label><input type="date" id="cf-${id}" value="${rec.fechaCaracterizacion||''}"></div>
+          <div class="form-group"><label class="form-label">Hora caracterización</label><input type="time" id="ch-${id}" value="${rec.horaCaracterizacion||''}"></div>
+        </div>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Observaciones</label>
+        <textarea id="ob-${id}" placeholder="Observaciones sobre la visita...">${rec.observacion||''}</textarea>
+      </div>
+      <button class="save-btn" id="sb-${id}">💾 Guardar</button>
+    </div>`;
+
+  card.querySelector('.student-top').addEventListener('click',()=>toggleCard(id));
+  card.querySelector('.edit-form').addEventListener('click',(e)=>e.stopPropagation());
+
+  const btns=card.querySelectorAll('.status-btn');
+  btns[0].addEventListener('click',(e)=>{e.stopPropagation();setStatus(id,'sin-contacto');});
+  btns[1].addEventListener('click',(e)=>{e.stopPropagation();setStatus(id,'agendado');});
+  btns[2].addEventListener('click',(e)=>{e.stopPropagation();setStatus(id,'caracterizado');});
+  btns[3].addEventListener('click',(e)=>{e.stopPropagation();setStatus(id,'contactado-pero');});
+  btns[4].addEventListener('click',(e)=>{e.stopPropagation();setStatus(id,'graduado');});
+  btns[5].addEventListener('click',(e)=>{e.stopPropagation();setStatus(id,'carta-cierre');});
+
+  card.querySelector('#sb-'+id).addEventListener('click',(e)=>{e.stopPropagation();saveStudent(id,key,student);});
+
+  formStatus[id]=status;
+  return card;
+}
+
+function toggleCard(id){
+  const form=document.getElementById('form-'+id);
+  const card=form.closest('.student-card');
+  const isOpen=form.classList.contains('open');
+  if(isOpen){
+    form.classList.remove('open');
+    card.classList.remove('expanded');
+  } else {
+    form.classList.add('open');
+    card.classList.add('expanded');
+  }
+}
+
+function setStatus(id,status){
+  formStatus[id]=status;
+  const form=document.getElementById('form-'+id);
+  form.querySelectorAll('.status-btn').forEach(b=>{
+    b.className='status-btn';
+    if(b.textContent.includes('Sin contacto')&&status==='sin-contacto')b.classList.add('active-sin');
+    if(b.textContent.includes('Agendado')&&status==='agendado')b.classList.add('active-agendado');
+    if(b.textContent.includes('Caracterizado')&&status==='caracterizado')b.classList.add('active-caracterizado');
+    if(b.textContent.includes('Contactado pero')&&status==='contactado-pero')b.classList.add('active-contactado-pero');
+    if(b.textContent.includes('Graduado')&&status==='graduado')b.classList.add('active-graduado');
+    if(b.textContent.includes('Carta de cierre')&&status==='carta-cierre')b.classList.add('active-carta-cierre');
+  });
+  document.getElementById('sched-'+id).className='schedule-fields'+(status==='agendado'?' show':'');
+  document.getElementById('char-'+id).className='char-fields'+(status==='caracterizado'?' show':'');
+}
+
+async function saveStudent(id,key,name){
+  const btn=document.getElementById('sb-'+id);
+  btn.disabled=true;btn.textContent='⏳ Guardando...';
+  const status=formStatus[id]||'sin-contacto';
+  const parts=key.split('||');
+  const payload={
+    gestor:parts[0],estudiante:parts[1],estado:status,
+    fechaAgenda:status==='agendado'?(document.getElementById('af-'+id)?.value||''):'',
+    horaAgenda:status==='agendado'?(document.getElementById('ah-'+id)?.value||''):'',
+    fechaCaracterizacion:status==='caracterizado'?(document.getElementById('cf-'+id)?.value||''):'',
+    horaCaracterizacion:status==='caracterizado'?(document.getElementById('ch-'+id)?.value||''):'',
+    observacion:document.getElementById('ob-'+id)?.value||''
+  };
+  const ok=await saveToSheet(payload);
+  btn.disabled=false;btn.innerHTML='💾 Guardar';
+  if(ok){
+    showToast('✅ '+name.split(' ')[0]+' guardado','success');
+    const labels={'sin-contacto':'Sin contacto','agendado':'Agendado','caracterizado':'Caracterizado','contactado-pero':'Contactado pero...','graduado':'Graduado','carta-cierre':'Carta de cierre'};
+    const badges={'sin-contacto':'badge-sin','agendado':'badge-agendado','caracterizado':'badge-caracterizado','contactado-pero':'badge-contactado-pero','graduado':'badge-graduado','carta-cierre':'badge-carta-cierre'};
+    const card=document.getElementById('form-'+id).closest('.student-card');
+    const pill=card.querySelector('.status-pill');
+    const badge=card.querySelector('.student-badge');
+    if(pill) pill.className='status-pill '+status;
+    if(badge){badge.className='student-badge '+badges[status];badge.textContent=labels[status];}
+    const students=DATA[currentGestor]||[];
+    const char=students.filter(s=>(sheetCache[currentGestor+'||'+s]||{}).estado==='caracterizado').length;
+    document.getElementById('student-counter').textContent=char+' / '+students.length;
+  } else {
+    showToast('❌ Error al guardar. Revisa conexión.','error');
+  }
+}
+
+function showToast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast '+(type||'');
+  t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),3000);
+}
+
+async function renderDashboard(){
+  showLoading('Cargando dashboard...');
+  await fetchSheetData();
+  hideLoading();
+  updateDashboardContent();
+}
+
+// ===================== AUTO-REFRESH =====================
+let autoRefreshInterval = null;
+let countdownInterval = null;
+let secondsLeft = 5;
+let isDashboardActive = false;
+
+function startAutoRefresh() {
+  isDashboardActive = true;
+  secondsLeft = 5;
+  updateTimerLabel();
+
+  countdownInterval = setInterval(() => {
+    secondsLeft--;
+    updateTimerLabel();
+    if (secondsLeft <= 0) {
+      secondsLeft = 5;
+      silentRefresh();
+    }
+  }, 1000);
+}
+
+function stopAutoRefresh() {
+  isDashboardActive = false;
+  clearInterval(countdownInterval);
+  countdownInterval = null;
+  const timer = document.getElementById('auto-timer');
+  if (timer) timer.textContent = '';
+}
+
+function updateTimerLabel() {
+  const timer = document.getElementById('auto-timer');
+  if (timer) timer.textContent = '↻ ' + secondsLeft + 's';
+}
+
+async function silentRefresh() {
+  // Refresh without showing loading overlay
+  try {
+    const res = await fetch(SHEET_URL + '?t=' + Date.now());
+    const rows = await res.json();
+    sheetCache = {};
+    rows.forEach(r => { if(r.gestor&&r.estudiante) sheetCache[r.gestor+'||'+r.estudiante]=r; });
+    setSyncState('synced', 'Actualizado · ' + new Date().toLocaleTimeString('es-CO', {hour:'2-digit',minute:'2-digit',second:'2-digit'}));
+    updateDashboardContent();
+  } catch(e) {
+    setSyncState('error', 'Error de conexión');
+  }
+}
+
+function updateDashboardContent() {
+  let total=0,char=0,agend=0,contactadoPero=0,grad=0,carta=0;
+  Object.values(DATA).forEach(arr=>total+=arr.length);
+  Object.values(sheetCache).forEach(r=>{
+    if(r.estado==='caracterizado')char++;
+    else if(r.estado==='agendado')agend++;
+    else if(r.estado==='contactado-pero')contactadoPero++;
+    else if(r.estado==='graduado')grad++;
+    else if(r.estado==='carta-cierre')carta++;
+  });
+  const sin=total-char-agend-contactadoPero-grad-carta;
+  const pct=Math.round((char+grad)/total*100);
+  document.getElementById('global-stats').innerHTML=`
+    <div class="stat-card"><h3>Total estudiantes</h3><div class="stat-num blue">${total}</div><div class="stat-sub">7 gestores activos</div></div>
+    <div class="stat-card"><h3>Graduados</h3><div class="stat-num" style="color:var(--purple)">${grad}</div><div class="stat-sub">Culminaron con éxito</div></div>
+    <div class="stat-card"><h3>Caracterizados</h3><div class="stat-num green">${char}</div><div class="stat-sub">${pct}% completado</div></div>
+    <div class="stat-card"><h3>Agendados</h3><div class="stat-num yellow">${agend}</div><div class="stat-sub">Visita programada</div></div>
+    <div class="stat-card"><h3>Contactado pero...</h3><div class="stat-num" style="color:var(--danger)">${contactadoPero}</div><div class="stat-sub">No continúa</div></div>
+    <div class="stat-card"><h3>Carta de cierre</h3><div class="stat-num" style="color:var(--brown)">${carta}</div><div class="stat-sub">Sin acompañamiento</div></div>
+    <div class="stat-card"><h3>Sin contacto</h3><div class="stat-num gray">${sin}</div><div class="stat-sub">Pendientes</div></div>
+  `;
+  const summaries=document.getElementById('gestor-summaries');
+  summaries.innerHTML='';
+  Object.entries(DATA).forEach(([gestor,students])=>{
+    let gChar=0,gAgend=0,gContactado=0,gGrad=0,gCarta=0;
+    students.forEach(s=>{const r=sheetCache[gestor+'||'+s]||{};
+      if(r.estado==='caracterizado')gChar++;
+      else if(r.estado==='agendado')gAgend++;
+      else if(r.estado==='contactado-pero')gContactado++;
+      else if(r.estado==='graduado')gGrad++;
+      else if(r.estado==='carta-cierre')gCarta++;
+    });
+    const gSin=students.length-gChar-gAgend-gContactado-gGrad-gCarta;
+    const gPct=Math.round((gChar+gGrad)/students.length*100);
+    const div=document.createElement('div');
+    div.className='gestor-card';
+    div.innerHTML=`
+      <div class="gestor-card-header"><h3>${gestor}</h3><span class="pct-badge">${gPct}%</span></div>
+      <div class="progress-bar"><div class="progress-fill" style="width:${gPct}%"></div></div>
+      <div class="gestor-mini-stats">
+        <span class="g-stat"><span class="g-dot" style="background:var(--purple)"></span><span style="color:var(--purple)">${gGrad} graduados</span></span>
+        <span class="g-stat"><span class="g-dot" style="background:var(--accent2)"></span><span style="color:var(--accent2)">${gChar} caracterizados</span></span>
+        <span class="g-stat"><span class="g-dot" style="background:var(--warn)"></span><span style="color:var(--warn)">${gAgend} agendados</span></span>
+        <span class="g-stat"><span class="g-dot" style="background:var(--danger)"></span><span style="color:var(--danger)">${gContactado} contactado pero...</span></span>
+        <span class="g-stat"><span class="g-dot" style="background:var(--brown)"></span><span style="color:var(--brown)">${gCarta} carta cierre</span></span>
+        <span class="g-stat"><span class="g-dot" style="background:var(--text3)"></span><span style="color:var(--text3)">${gSin} sin contacto</span></span>
+        <span style="margin-left:auto;color:var(--text2);font-size:0.75rem;font-weight:600">${students.length} estudiantes</span>
+      </div>`;
+    summaries.appendChild(div);
+  });
+}
+
+async function manualRefresh() {
+  secondsLeft = 5;
+  showLoading('Actualizando...');
+  await fetchSheetData();
+  hideLoading();
+  updateDashboardContent();
+  showToast('✅ Dashboard actualizado', 'success');
+}
+
+// handleAutoRefresh is called from showView
+function handleAutoRefresh(v) {
+  if (v === 'dashboard') startAutoRefresh();
+  else stopAutoRefresh();
+}
+</script>
+</body>
+</html>
